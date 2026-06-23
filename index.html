@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChebuYoga — BioWolf Technology</title>
+    <style>
+        :root { 
+            --bg: #0a0a0c; 
+            --card: #121216; 
+            --text: #ffffff; 
+            --accent: #ff5500; /* Яркий неоновый оранжевый */
+            --music: #00ff66;  /* Кислотно-зеленый неон */
+            --neon-glow: 0 0 15px var(--accent), 0 0 30px var(--accent);
+            --neon-music: 0 0 15px var(--music);
+        }
+        
+        body { 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            overflow: hidden; 
+        }
+
+        /* Стильный неоновый контейнер */
+        .container { 
+            text-align: center; 
+            background: var(--card); 
+            padding: 40px; 
+            border-radius: 20px; 
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 25px rgba(255, 85, 0, 0.2), inset 0 0 15px rgba(255, 85, 0, 0.1); 
+            width: 380px; 
+        }
+
+        /* МЕСТО ДЛЯ ЛОГОТИПА НЕОНОВОГО ВОЛКА */
+        .logo-area {
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Текстовая заглушка волка с неоновым свечением */
+        .wolf-logo-placeholder {
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: #fff;
+            text-shadow: var(--neon-glow);
+            border: 1px dashed rgba(255, 85, 0, 0.4);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        /* Если у тебя будет картинка волка wolf.png, эта настройка для неё: */
+        .wolf-logo-img {
+            max-width: 120px;
+            height: auto;
+            filter: drop-shadow(0 0 10px var(--accent));
+            display: none; /* Переключи на block, когда добавишь файл */
+        }
+
+        h1 { font-size: 24px; color: #fff; text-shadow: var(--neon-glow); margin: 15px 0 5px 0; text-transform: uppercase; }
+        .timer { font-size: 68px; font-weight: bold; margin: 15px 0; font-variant-numeric: tabular-nums; text-shadow: 0 0 10px #fff; }
+        .status { font-size: 14px; color: #8a8a93; letter-spacing: 1px; text-transform: uppercase; }
+        
+        .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(6, 6, 8, 0.98); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
+        .overlay.active { opacity: 1; pointer-events: auto; }
+        .content { text-align: center; max-width: 600px; padding: 20px; display: flex; flex-direction: column; align-items: center; z-index: 10; }
+        
+        .my-video {
+            width: 340px;
+            height: 190px;
+            border-radius: 15px;
+            border: 2px solid var(--accent);
+            box-shadow: var(--neon-glow);
+            margin-bottom: 20px;
+            background: #000;
+        }
+        
+        .speech { font-style: italic; color: #ffaa66; font-size: 18px; margin-bottom: 15px; text-shadow: 0 0 5px rgba(255,170,102,0.3); }
+        .exercises { text-align: left; font-size: 18px; line-height: 1.6; margin-bottom: 20px; width: 100%; color: #e1e1e6; }
+        .btn-group { display: flex; gap: 15px; justify-content: center; margin-bottom: 15px; }
+        
+        /* Неоновые кнопки */
+        .btn { background: transparent; color: #fff; border: 2px solid var(--accent); padding: 12px 25px; font-size: 15px; border-radius: 25px; cursor: pointer; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; transition: all 0.2s; box-shadow: inset 0 0 8px rgba(255, 85, 0, 0.2); }
+        .btn:hover { background: var(--accent); box-shadow: var(--neon-glow); color: #000; transform: scale(1.05); }
+        
+        .btn-m { border-color: var(--music); color: #fff; box-shadow: inset 0 0 8px rgba(0, 255, 102, 0.2); }
+        .btn-m:hover { background: var(--music); box-shadow: var(--neon-music); color: #000; }
+
+        /* Фирменный подвал с авторскими правами */
+        .footer-credits {
+            margin-top: 30px;
+            font-size: 11px;
+            color: #666;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 0 2px rgba(255,255,255,0.1);
+        }
+        .footer-credits a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo-area">
+            <div class="wolf-logo-placeholder" id="wolf-text">BIOWOLF</div>
+            <img src="wolf.png" alt="BioWolf Logo" class="wolf-logo-img" id="wolf-img">
+        </div>
+
+        <h1>Время работать ✨</h1>
+        <div class="status" id="status-text">До разминки осталось:</div>
+        <div class="timer" id="w-timer" style="color: #fff; text-shadow: var(--neon-glow);">01:00</div>
+        
+        <div class="footer-credits">
+            © Tech.<a href="https://chebur.shop" target="_blank">chebur.shop</a> | +49017661566356
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay">
+        <div class="content">
+            
+            <video class="my-video" id="yoga-video" controls preload="auto" loop muted>
+                <source src="video.mp4" type="video/mp4">
+                Ваш браузер не поддерживает видео.
+            </video>
+            
+            <h2 style="text-shadow: var(--neon-glow);">Время разминки! 🧘‍♂️</h2>
+            <div class="speech">«Ген, заbasic-уйся... Вдохни поглубже и расправь плечи!»</div>
+            <div class="timer" id="r-timer" style="color: var(--music); text-shadow: var(--neon-music);">02:00</div>
+            
+            <ul class="exercises">
+                <li>👀 <strong>Глаза:</strong> Закрой глаза на 10 секунд, посмотри в окно вдаль.</li>
+                <li>🧘‍♂️ <strong>Спина:</strong> Встань ровно, потянись лапами вверх.</li>
+                <li>💧 <strong>Вода:</strong> Сделай пару глотков чистой воды.</li>
+            </ul>
+
+            <div class="btn-group">
+                <button class="btn btn-m" id="m-btn">🎵 Включить музыку релакс</button>
+                <button class="btn" id="s-btn">Вернуться в суету</button>
+            </div>
+
+            <div class="footer-credits" style="color: #444;">
+                © Tech.<a href="https://chebur.shop" target="_blank">chebur.shop</a> | +49017661566356
+            </div>
+        </div>
+    </div>
+
+    <audio id="bg-music" preload="auto" loop></audio>
+
+    <script>
+        const WORK_DURATION = 60;   // 1 минута для тестов (для часа ставь 3600)
+        const REST_DURATION = 120;  // 2 минуты отдыха
+        const MUSIC_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3";
+
+        let timer = null;
+        let notificationSent = false;
+        const wEl = document.getElementById('w-timer');
+        const rEl = document.getElementById('r-timer');
+        const ovEl = document.getElementById('overlay');
+        const musicAudio = document.getElementById('bg-music');
+        const videoPlayer = document.getElementById('yoga-video');
+        const musicBtn = document.getElementById('m-btn');
+        
+        musicAudio.src = MUSIC_URL;
+
+        if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+            Notification.requestPermission();
+        }
+
+        function format(seconds) {
+            if (seconds < 0) seconds = 0;
+            return `${Math.floor(seconds/60).toString().padStart(2,'0')}:${(seconds%60).toString().padStart(2,'0')}`;
+        }
+
+        function sendNotification(title, body) {
+            if (Notification.permission === "granted" && !notificationSent) {
+                new Notification(title, { body: body });
+                notificationSent = true;
+            }
+        }
+
+        function updateTimer() {
+            const now = Math.floor(Date.now() / 1000);
+            let endTime = parseInt(localStorage.getItem('chebu_endTime'));
+            let mode = localStorage.getItem('chebu_mode');
+
+            if (!endTime || !mode) {
+                localStorage.setItem('chebu_mode', 'work');
+                localStorage.setItem('chebu_endTime', now + WORK_DURATION);
+                mode = 'work';
+                endTime = now + WORK_DURATION;
+            }
+
+            let timeLeft = endTime - now;
+
+            if (timeLeft <= 0) {
+                if (mode === 'work') {
+                    localStorage.setItem('chebu_mode', 'rest');
+                    localStorage.setItem('chebu_endTime', now + REST_DURATION);
+                    ovEl.classList.add('active');
+                    wEl.innerText = format(0);
+                    rEl.innerText = format(REST_DURATION);
+                    
+                    videoPlayer.play().catch(e => console.log("Браузер ждет клика"));
+                    sendNotification("Чебурашка зовёт!", "Фёдор, пора размяться!");
+                } else {
+                    startWorkMode();
+                }
+            } else {
+                if (mode === 'work') {
+                    ovEl.classList.remove('active');
+                    wEl.innerText = format(timeLeft);
+                    notificationSent = false;
+                } else {
+                    ovEl.classList.add('active');
+                    rEl.innerText = format(timeLeft);
+                }
+            }
+        }
+
+        function startWorkMode() {
+            const now = Math.floor(Date.now() / 1000);
+            localStorage.setItem('chebu_mode', 'work');
+            localStorage.setItem('chebu_endTime', now + WORK_DURATION);
+            ovEl.classList.remove('active');
+            
+            musicAudio.pause();
+            musicAudio.currentTime = 0;
+            videoPlayer.pause();
+            videoPlayer.currentTime = 0;
+            musicBtn.innerText = "🎵 Включить музыку релакс";
+            
+            wEl.innerText = format(WORK_DURATION);
+            notificationSent = false;
+        }
+
+        clearInterval(timer);
+        timer = setInterval(updateTimer, 1000);
+        updateTimer();
+
+        musicBtn.addEventListener('click', () => {
+            if (musicAudio.paused) {
+                musicAudio.play()
+                    .then(() => { musicBtn.innerText = "⏸ Поставить на паузу"; })
+                    .catch(e => console.log("Браузер блокирует звук"));
+            } else {
+                musicAudio.pause();
+                musicBtn.innerText = "🎵 Включить музыку релакс";
+            }
+        });
+
+        document.getElementById('s-btn').addEventListener('click', startWorkMode);
+    </script>
+</body>
+</html>
