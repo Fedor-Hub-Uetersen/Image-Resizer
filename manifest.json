@@ -1,0 +1,25 @@
+{
+  "name": "Image Optimizer – Tech.Chebur.Shop",
+  "short_name": "Image Optimizer",
+  "description": "Local image resizer, compressor and format converter (PNG, WebP, JPEG) with batch ZIP export.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#06090f",
+  "theme_color": "#00f2fe",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
