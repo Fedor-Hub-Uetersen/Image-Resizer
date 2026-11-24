@@ -1,323 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Optimizer – Tech.Chebur.Shop</title>
+    <style>
+        :root {
+            --bg-page: radial-gradient(circle at 15% 10%, rgba(0, 242, 254, 0.14), transparent 42%),
+                        radial-gradient(circle at 88% 85%, rgba(127, 0, 255, 0.16), transparent 45%),
+                        linear-gradient(145deg, #06090f 0%, #0b1120 52%, #130c24 100%);
+            --bg-card: rgba(13, 17, 23, 0.92);
+            --bg-panel: rgba(22, 27, 34, 0.85);
+            --bg-panel-hover: rgba(30, 38, 51, 0.95);
+            --bg-input: #0a0e14;
+            --bg-btn-item: #1f2937;
+            --bg-btn-item-hover: #283548;
+            --border-card: rgba(56, 189, 248, 0.22);
+            --border-subtle: #30363d;
+            --border-panel: #21262d;
+            --text-main: #e2e8f0;
+            --text-label: #c9d1d9;
+            --text-muted: #8b949e;
+            --text-input: #f0f6fc;
+            --accent-primary: #00f2fe;
+            --accent-secondary: #4facfe;
+            --accent-purple: #7f00ff;
+            --accent-pink: #ff007f;
+            --card-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 24px rgba(0, 242, 254, 0.12);
+            --logo-shadow: drop-shadow(0 0 8px rgba(0, 242, 254, 0.45));
+            --brand-glow: 0 0 8px rgba(0, 242, 254, 0.55), 0 0 16px rgba(79, 172, 254, 0.35);
+        }
+
+        [data-theme="light"] {
+            --bg-page: radial-gradient(circle at 12% 12%, rgba(2, 132, 199, 0.14), transparent 42%),
+                        radial-gradient(circle at 88% 82%, rgba(109, 40, 217, 0.11), transparent 46%),
+                        linear-gradient(145deg, #e8f1ff 0%, #f8fafc 50%, #ede9fe 100%);
+            --bg-card: rgba(255, 255, 255, 0.94);
+            --bg-panel: rgba(248, 250, 252, 0.92);
+            --bg-panel-hover: rgba(224, 242, 254, 0.72);
+            --bg-input: #ffffff;
+            --bg-btn-item: #f1f5f9;
+            --bg-btn-item-hover: #e2e8f0;
+            --border-card: rgba(2, 132, 199, 0.22);
+            --border-subtle: #cbd5e1;
+            --border-panel: #e2e8f0;
+            --text-main: #0f172a;
+            --text-label: #334155;
+            --text-muted: #64748b;
+            --text-input: #0f172a;
+            --accent-primary: #0284c7;
+            --accent-secondary: #2563eb;
+            --accent-purple: #6d28d9;
+            --accent-pink: #db2777;
+            --card-shadow: 0 16px 36px rgba(15, 23, 42, 0.09), 0 4px 14px rgba(2, 132, 199, 0.08);
+            --logo-shadow: none;
+            --brand-glow: 0 0 10px rgba(2, 132, 199, 0.24);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 16px;
+            min-height: 100vh;
+            background: var(--bg-page);
+            background-attachment: fixed;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            color: var(--text-main);
+            transition: background 0.3s ease, color 0.25s ease;
+        }
+
+        .image-resizer-container {
+            max-width: 600px;
+            margin: 12px auto;
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-card);
+            transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            gap: 8px;
+        }
+
+        .theme-toggle, .lang-btn {
+            background: var(--bg-panel);
+            color: var(--text-label);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover, .lang-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .lang-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .lang-btn.active {
+            background: var(--accent-primary);
+            color: #06090f;
+            border-color: var(--accent-primary);
+        }
+
+        .resizer-logo-wrap {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .resizer-logo {
+            max-height: 54px;
+            width: auto;
+            object-fit: contain;
+            filter: var(--logo-shadow);
+        }
+
+        .resizer-title {
+            text-align: center;
+            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 20px;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .upload-box {
+            display: block;
+            border: 2px dashed var(--accent-primary);
+            padding: 30px 18px;
+            text-align: center;
+            border-radius: 12px;
+            background: var(--bg-panel);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .upload-box:hover, .upload-box.drag-over {
+            background: var(--bg-panel-hover);
+            border-color: var(--accent-purple);
+        }
+        .upload-box input[type="file"] { display: none; }
+        .upload-box span { color: var(--text-muted); font-size: 14px; font-weight: 500; }
+
+        .presets-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .preset-btn {
+            padding: 10px 8px;
+            background: var(--bg-panel);
+            color: var(--accent-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .preset-btn:hover {
+            border-color: var(--accent-primary);
+            background: var(--bg-panel-hover);
+        }
+
+        .resizer-settings {
+            margin: 16px 0 20px;
+            background: var(--bg-panel);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-panel);
+        }
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 13px;
+            gap: 10px;
+        }
+        .setting-row:last-child { margin-bottom: 0; }
+        .setting-row label {
+            font-weight: 600;
+            font-size: 13.5px;
+            color: var(--text-label);
+            cursor: pointer;
+        }
+        .setting-row input[type="number"], .setting-row select {
+            padding: 8px 10px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 7px;
+            width: 165px;
+            background: var(--bg-input);
+            color: var(--text-input);
+            font-size: 13.5px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .setting-row input[type="number"]:focus, .setting-row select:focus {
+            border-color: var(--accent-primary);
+        }
+        .setting-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+        }
+
+        #processBtn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(45deg, var(--accent-purple), var(--accent-pink));
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 14px rgba(127, 0, 255, 0.28);
+        }
+        #processBtn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(255, 0, 127, 0.45);
+        }
+        #processBtn:disabled {
+            background: var(--bg-panel);
+            color: var(--text-muted);
+            border: 1px solid var(--border-subtle);
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        #resizerStatus {
+            margin-top: 14px;
+            text-align: center;
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 13.5px;
+        }
+
+        #zipWrap {
+            margin-top: 14px;
+            display: none;
+        }
+        .zip-btn {
+            width: 100%;
+            padding: 11px;
+            background: var(--bg-panel);
+            color: var(--accent-primary);
+            border: 1px solid var(--accent-primary);
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .zip-btn:hover {
+            background: var(--accent-primary);
+            color: #06090f;
+        }
+
+        #downloadLinks {
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+        .download-btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-btn-item);
+            padding: 10px 14px;
+            border-radius: 9px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 13px;
+            border: 1px solid var(--border-subtle);
+            transition: all 0.2s ease;
+        }
+        .download-btn:hover {
+            background: var(--bg-btn-item-hover);
+            border-color: var(--accent-primary);
+        }
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+        .item-thumb {
+            width: 38px;
+            height: 38px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid var(--border-subtle);
+            flex-shrink: 0;
+            background: #fff;
+        }
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .item-name {
+            font-weight: 600;
+            color: var(--accent-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .item-meta {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .download-btn strong {
+            color: var(--accent-pink);
+            text-transform: uppercase;
+            font-size: 11.5px;
+            letter-spacing: 0.4px;
+            flex-shrink: 0;
+        }
+
+        .app-footer {
+            margin-top: 22px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border-panel);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .footer-rights {
+            line-height: 1.5;
+        }
+
+        .brand-glow-link {
+            color: var(--accent-primary);
+            font-weight: 700;
+            text-decoration: none;
+            text-shadow: var(--brand-glow);
+            transition: all 0.2s ease;
+        }
+
+        .brand-glow-link:hover {
+            color: var(--accent-secondary);
+            text-decoration: underline;
+        }
+
+        .footer-link {
+            background: none;
+            border: none;
+            padding: 0;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 11.5px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-primary);
+            text-decoration: underline;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.68);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal-backdrop.open { display: flex; }
+        .modal-card {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            max-width: 520px;
+            width: 100%;
+            max-height: 82vh;
+            overflow-y: auto;
+            padding: 22px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-panel);
+            padding-bottom: 10px;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 17px;
+            color: var(--accent-primary);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal-body {
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: var(--text-label);
+        }
+        .modal-body p { margin: 0 0 10px; }
+
+        @media (max-width: 460px) {
+            .image-resizer-container { padding: 18px 14px; }
+            .setting-row input[type="number"], .setting-row select { width: 135px; }
+            .presets-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
 <div class="image-resizer-container">
-    
-    <div class="resizer-logo-wrap">
-        <img src="logo.png" class="resizer-logo" alt="Логотип">
+    <div class="top-bar">
+        <button type="button" class="theme-toggle" id="themeToggle">☀️ Light</button>
+        <div class="lang-group">
+            <button type="button" class="lang-btn" data-lang="en">EN</button>
+            <button type="button" class="lang-btn" data-lang="de">DE</button>
+            <button type="button" class="lang-btn" data-lang="ru">RU</button>
+        </div>
     </div>
 
-    <h2 class="resizer-title">Оптимизатор картинок</h2>
-    
+    <div class="resizer-logo-wrap">
+        <img src="logo.png" class="resizer-logo" alt="Tech.Chebur.Shop" onerror="this.style.display='none'">
+    </div>
+
+    <h2 class="resizer-title" data-i18n="title">Image Optimizer</h2>
+
     <label class="upload-box" id="dropZone">
-        <span id="uploadText">📁 Нажмите или перетащите сюда картинки</span>
+        <span id="uploadText" data-i18n="dropHint">📁 Tap or drag & drop images here</span>
         <input type="file" id="fileInput" multiple accept="image/*">
     </label>
 
-    <div class="presets-row">
-        <button type="button" class="preset-btn" data-w="512" data-h="512" data-fmt="image/png">📱 Иконка 512×512</button>
-        <button type="button" class="preset-btn" data-w="1024" data-h="500" data-fmt="image/png">🖼️ Баннер 1024×500</button>
+    <div class="presets-grid">
+        <button type="button" class="preset-btn" data-w="512" data-h="512" data-fmt="image/png" data-i18n="presetIcon">📱 Icon 512×512</button>
+        <button type="button" class="preset-btn" data-w="1024" data-h="500" data-fmt="image/png" data-i18n="presetBanner">🖼️ Banner 1024×500</button>
+        <button type="button" class="preset-btn" data-w="1080" data-h="1080" data-fmt="image/webp" data-i18n="presetSquare">⬛ Square 1080×1080</button>
+        <button type="button" class="preset-btn" data-w="1200" data-h="630" data-fmt="image/jpeg" data-i18n="presetSocial">🌐 Post 1200×630</button>
     </div>
 
     <div class="resizer-settings">
         <div class="setting-row">
-            <label for="targetWidth">Ширина (px):</label>
+            <label for="targetWidth" data-i18n="widthLabel">Width (px):</label>
             <input type="number" id="targetWidth" value="512" min="10" max="5000">
         </div>
         <div class="setting-row">
-            <label for="targetHeight">Высота (px):</label>
+            <label for="targetHeight" data-i18n="heightLabel">Height (px):</label>
             <input type="number" id="targetHeight" value="512" min="10" max="5000">
         </div>
         <div class="setting-row checkbox-row">
-            <label for="keepRatio">Сохранять пропорции:</label>
+            <label for="keepRatio" data-i18n="keepRatioLabel">Keep aspect ratio:</label>
             <input type="checkbox" id="keepRatio">
         </div>
         <div class="setting-row">
-            <label for="format">Формат вывода:</label>
+            <label for="format" data-i18n="formatLabel">Output format:</label>
             <select id="format">
-                <option value="image/png">PNG (для Google Play)</option>
-                <option value="image/webp">WebP (лучшее сжатие)</option>
-                <option value="image/jpeg">JPEG</option>
+                <option value="image/png" data-i18n="fmtPng">PNG (Google Play)</option>
+                <option value="image/webp" data-i18n="fmtWebp">WebP (best compression)</option>
+                <option value="image/jpeg" data-i18n="fmtJpeg">JPEG</option>
             </select>
         </div>
         <div class="setting-row">
-            <label for="quality">Качество (0.1 - 1.0):</label>
+            <label for="quality" data-i18n="qualityLabel">Quality (0.1 – 1.0):</label>
             <input type="number" id="quality" value="0.9" step="0.1" min="0.1" max="1.0">
         </div>
     </div>
 
-    <button id="processBtn" disabled>Сжать и конвертировать</button>
-    
-    <div id="resizerStatus">Файлы не выбраны</div>
+    <button id="processBtn" disabled data-i18n="processBtn">Compress & Convert</button>
+
+    <div id="resizerStatus" data-i18n="noFiles">No files selected</div>
+
+    <div id="zipWrap">
+        <button type="button" id="downloadZipBtn" class="zip-btn" data-i18n="downloadZip">📦 Download All (.zip)</button>
+    </div>
+
     <div id="downloadLinks"></div>
+
+    <footer class="app-footer">
+        <div class="footer-rights">
+            <span data-i18n="rightsText">All rights reserved 2026 · </span>
+            <a href="https://Tech.chebur.shop" target="_blank" rel="noopener noreferrer" class="brand-glow-link">™Tech.chebur.shop Solutions</a>
+        </div>
+        <button type="button" class="footer-link" id="openPrivacyBtn" data-i18n="privacyLink">Privacy Policy</button>
+    </footer>
 </div>
 
-<style>
-    /* Основной контейнер в стиле темного неона */
-    .image-resizer-container { 
-        max-width: 600px; 
-        margin: 30px auto; 
-        background: #0d1117; 
-        padding: 30px; 
-        border-radius: 16px; 
-        box-shadow: 0 0 20px rgba(0, 242, 254, 0.2), 0 0 40px rgba(127, 0, 255, 0.1); 
-        border: 1px solid #1f2937;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
-        color: #e2e8f0; 
-    }
-    
-    /* Стили для логотипа */
-    .resizer-logo-wrap {
-        text-align: center;
-        margin-bottom: 15px;
-    }
-    .resizer-logo {
-        max-height: 60px;
-        width: auto;
-        object-fit: contain;
-        filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.5));
-    }
-
-    /* Заголовок с градиентом и свечением */
-    .resizer-title { 
-        text-align: center; 
-        background: linear-gradient(45deg, #00f2fe, #4facfe);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-top: 0; 
-        margin-bottom: 25px; 
-        font-size: 26px; 
-        font-weight: bold; 
-        text-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
-    }
-
-    /* Зона загрузки файлов с неоновым контуром */
-    .upload-box { 
-        display: block; 
-        border: 2px dashed #00f2fe; 
-        padding: 35px; 
-        text-align: center; 
-        border-radius: 10px; 
-        background: #161b22; 
-        cursor: pointer; 
-        transition: all 0.3s ease; 
-        box-shadow: inset 0 0 10px rgba(0, 242, 254, 0.05);
-    }
-    .upload-box:hover { 
-        background: #1c212c; 
-        border-color: #7f00ff;
-        box-shadow: 0 0 15px rgba(127, 0, 255, 0.4), inset 0 0 15px rgba(127, 0, 255, 0.1);
-    }
-    .upload-box input[type="file"] { display: none; }
-    .upload-box span { color: #8b949e; font-size: 15px; }
-
-    /* Быстрые пресеты */
-    .presets-row {
-        display: flex;
-        gap: 10px;
-        margin-top: 18px;
-    }
-    .preset-btn {
-        flex: 1;
-        padding: 10px;
-        background: #161b22;
-        color: #00f2fe;
-        border: 1px solid #30363d;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    .preset-btn:hover {
-        border-color: #00f2fe;
-        background: #1c212c;
-        box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
-    }
-
-    /* Блок настроек */
-    .resizer-settings { 
-        margin: 18px 0 25px; 
-        background: #161b22; 
-        padding: 18px; 
-        border-radius: 10px; 
-        border: 1px solid #21262d; 
-    }
-    .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .setting-row:last-child { margin-bottom: 0; }
-    .setting-row label { font-weight: 600; font-size: 14px; color: #c9d1d9; cursor: pointer; }
-    
-    /* Поля ввода и выпадающие списки */
-    .setting-row input[type="number"], .setting-row select { 
-        padding: 8px; 
-        border: 1px solid #30363d; 
-        border-radius: 6px; 
-        width: 150px; 
-        box-sizing: border-box; 
-        background: #0d1117; 
-        color: #f0f6fc; 
-        outline: none; 
-        transition: border-color 0.2s; 
-    }
-    .setting-row input[type="number"]:focus, .setting-row select:focus {
-        border-color: #00f2fe;
-    }
-    .setting-row input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        accent-color: #00f2fe;
-        cursor: pointer;
-    }
-
-    /* Кнопка запуска с неоновым пульсирующим эффектом */
-    #processBtn { 
-        width: 100%; 
-        padding: 14px; 
-        background: linear-gradient(45deg, #7f00ff, #ff007f); 
-        color: white; 
-        border: none; 
-        border-radius: 8px; 
-        font-size: 16px; 
-        font-weight: bold; 
-        cursor: pointer; 
-        transition: all 0.3s ease; 
-        box-shadow: 0 0 10px rgba(127, 0, 255, 0.3);
-    }
-    #processBtn:hover:not(:disabled) { 
-        box-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
-        transform: translateY(-1px);
-    }
-    #processBtn:disabled { 
-        background: #21262d; 
-        color: #8b949e; 
-        border: 1px solid #30363d;
-        box-shadow: none;
-        cursor: not-allowed; 
-    }
-
-    /* Статус-бар */
-    #resizerStatus { margin-top: 18px; text-align: center; font-weight: 500; color: #8b949e; font-size: 14px; }
-    
-    /* Ссылки на скачивание */
-    #downloadLinks { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
-    .download-btn { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        background: #1f2937; 
-        padding: 12px 16px; 
-        border-radius: 8px; 
-        text-decoration: none; 
-        color: #00f2fe; 
-        font-size: 14px; 
-        border: 1px solid #30363d; 
-        transition: all 0.2s ease; 
-    }
-    .download-btn:hover { 
-        background: #283548; 
-        border-color: #00f2fe;
-        color: #00f2fe;
-        box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
-        text-decoration: none; 
-    }
-    .download-btn strong { color: #ff007f; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;}
-</style>
+<div class="modal-backdrop" id="privacyModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 id="privacyTitle">Privacy Policy</h3>
+            <button type="button" class="modal-close" id="closePrivacyBtn" aria-label="Close">×</button>
+        </div>
+        <div class="modal-body" id="privacyBody"></div>
+    </div>
+</div>
 
 <script>
 (function() {
+    const i18n = {
+        en: {
+            title: "Image Optimizer",
+            dropHint: "📁 Tap or drag & drop images here",
+            selectedFiles: (n) => `Selected files: ${n}`,
+            presetIcon: "📱 Icon 512×512",
+            presetBanner: "🖼️ Banner 1024×500",
+            presetSquare: "⬛ Square 1080×1080",
+            presetSocial: "🌐 Post 1200×630",
+            widthLabel: "Width (px):",
+            heightLabel: "Height (px):",
+            keepRatioLabel: "Keep aspect ratio:",
+            formatLabel: "Output format:",
+            fmtPng: "PNG (Google Play)",
+            fmtWebp: "WebP (best compression)",
+            fmtJpeg: "JPEG",
+            qualityLabel: "Quality (0.1 – 1.0):",
+            processBtn: "Compress & Convert",
+            noFiles: "No files selected",
+            origSize: (w, h) => `Original size: ${w}×${h} px`,
+            ready: "Ready to process",
+            presetApplied: (w, h, ext) => `Preset: ${w}×${h} (${ext.toUpperCase()})`,
+            processing: "Processing...",
+            done: "All files processed successfully!",
+            error: "Error while processing images.",
+            downloadBtn: "Save",
+            downloadZip: "📦 Download All (.zip)",
+            themeLight: "☀️ Light",
+            themeDark: "🌙 Dark",
+            rightsText: "All rights reserved 2026 · ",
+            privacyLink: "Privacy Policy",
+            privacyTitle: "Privacy Policy",
+            privacyHtml: `
+                <p><strong>1. Local Processing Only</strong><br>This application processes all images strictly locally on your device. Your photos and files are never uploaded, transmitted, or stored on any external server.</p>
+                <p><strong>2. No Personal Data Collection</strong><br>We do not collect, track, or share personal information, analytics, or advertising identifiers.</p>
+                <p><strong>3. Local Preferences</strong><br>Selected theme and interface language are saved only in your device's local storage for your convenience.</p>
+                <p><strong>4. Contact</strong><br>Developer: Tech.Chebur.Shop (https://Tech.chebur.shop)</p>
+            `
+        },
+        de: {
+            title: "Bild-Optimierer",
+            dropHint: "📁 Bilder antippen oder hierher ziehen",
+            selectedFiles: (n) => `Ausgewählte Dateien: ${n}`,
+            presetIcon: "📱 Icon 512×512",
+            presetBanner: "🖼️ Banner 1024×500",
+            presetSquare: "⬛ Quadrat 1080×1080",
+            presetSocial: "🌐 Beitrag 1200×630",
+            widthLabel: "Breite (px):",
+            heightLabel: "Höhe (px):",
+            keepRatioLabel: "Seitenverhältnis sperren:",
+            formatLabel: "Ausgabeformat:",
+            fmtPng: "PNG (für Google Play)",
+            fmtWebp: "WebP (beste Komprimierung)",
+            fmtJpeg: "JPEG",
+            qualityLabel: "Qualität (0.1 – 1.0):",
+            processBtn: "Komprimieren & Konvertieren",
+            noFiles: "Keine Dateien ausgewählt",
+            origSize: (w, h) => `Originalgröße: ${w}×${h} px`,
+            ready: "Bereit zur Verarbeitung",
+            presetApplied: (w, h, ext) => `Vorlage: ${w}×${h} (${ext.toUpperCase()})`,
+            processing: "Verarbeitung läuft...",
+            done: "Alle Dateien erfolgreich verarbeitet!",
+            error: "Fehler bei der Bildverarbeitung.",
+            downloadBtn: "Speichern",
+            downloadZip: "📦 Alle herunterladen (.zip)",
+            themeLight: "☀️ Hell",
+            themeDark: "🌙 Dunkel",
+            rightsText: "Alle Rechte vorbehalten 2026 · ",
+            privacyLink: "Datenschutz",
+            privacyTitle: "Datenschutzerklärung",
+            privacyHtml: `
+                <p><strong>1. Ausschließlich lokale Verarbeitung</strong><br>Diese Anwendung verarbeitet alle Bilder ausschließlich lokal auf Ihrem Gerät. Ihre Fotos und Dateien werden weder an externe Server gesendet noch dort gespeichert.</p>
+                <p><strong>2. Keine Erhebung personenbezogener Daten</strong><br>Wir erfassen, verfolgen oder teilen keinerlei personenbezogene Daten, Analysen oder Werbe-IDs.</p>
+                <p><strong>3. Lokale Einstellungen</strong><br>Das gewählte Farbschema und die Sprache werden ausschließlich im lokalen Speicher Ihres Geräts abgelegt.</p>
+                <p><strong>4. Kontakt</strong><br>Entwickler: Tech.Chebur.Shop (https://Tech.chebur.shop)</p>
+            `
+        },
+        ru: {
+            title: "Оптимизатор картинок",
+            dropHint: "📁 Нажмите или перетащите сюда картинки",
+            selectedFiles: (n) => `Выбрано файлов: ${n}`,
+            presetIcon: "📱 Иконка 512×512",
+            presetBanner: "🖼️ Баннер 1024×500",
+            presetSquare: "⬛ Квадрат 1080×1080",
+            presetSocial: "🌐 Пост 1200×630",
+            widthLabel: "Ширина (px):",
+            heightLabel: "Высота (px):",
+            keepRatioLabel: "Сохранять пропорции:",
+            formatLabel: "Формат вывода:",
+            fmtPng: "PNG (для Google Play)",
+            fmtWebp: "WebP (лучшее сжатие)",
+            fmtJpeg: "JPEG",
+            qualityLabel: "Качество (0.1 – 1.0):",
+            processBtn: "Сжать и конвертировать",
+            noFiles: "Файлы не выбраны",
+            origSize: (w, h) => `Исходный размер: ${w}×${h} px`,
+            ready: "Готово к обработке",
+            presetApplied: (w, h, ext) => `Выбран формат: ${w}×${h} (${ext.toUpperCase()})`,
+            processing: "Обработка...",
+            done: "Все файлы успешно обработаны!",
+            error: "Ошибка при обработке файлов.",
+            downloadBtn: "Скачать",
+            downloadZip: "📦 Скачать всё (.zip)",
+            themeLight: "☀️ Светлая",
+            themeDark: "🌙 Тёмная",
+            rightsText: "Все права защищены 2026 · ",
+            privacyLink: "Политика конфиденциальности",
+            privacyTitle: "Политика конфиденциальности",
+            privacyHtml: `
+                <p><strong>1. Только локальная обработка</strong><br>Приложение обрабатывает все изображения исключительно локально на вашем устройстве. Ваши фотографии и файлы никуда не загружаются и не передаются на сторонние серверы.</p>
+                <p><strong>2. Отсутствие сбора личных данных</strong><br>Мы не собираем, не отслеживаем и не передаём третьим лицам персональные данные, аналитику или рекламные идентификаторы.</p>
+                <p><strong>3. Локальные настройки</strong><br>Выбранная тема оформления и язык интерфейса сохраняются только в локальной памяти вашего устройства.</p>
+                <p><strong>4. Контакты</strong><br>Разработчик: Tech.Chebur.Shop (https://Tech.chebur.shop)</p>
+            `
+        }
+    };
+
+    let currentLang = localStorage.getItem('resizer_lang') ||
+        (navigator.language.startsWith('ru') ? 'ru' : navigator.language.startsWith('de') ? 'de' : 'en');
+    let currentTheme = localStorage.getItem('resizer_theme') || 'dark';
+
+    const themeToggle = document.getElementById('themeToggle');
     const fileInput = document.getElementById('fileInput');
     const dropZone = document.getElementById('dropZone');
     const uploadText = document.getElementById('uploadText');
     const processBtn = document.getElementById('processBtn');
     const status = document.getElementById('resizerStatus');
     const downloadLinks = document.getElementById('downloadLinks');
-    
+    const zipWrap = document.getElementById('zipWrap');
+    const downloadZipBtn = document.getElementById('downloadZipBtn');
+
     const targetWidthInput = document.getElementById('targetWidth');
     const targetHeightInput = document.getElementById('targetHeight');
     const keepRatioCheckbox = document.getElementById('keepRatio');
     const formatSelect = document.getElementById('format');
 
+    const privacyModal = document.getElementById('privacyModal');
+    const privacyTitle = document.getElementById('privacyTitle');
+    const privacyBody = document.getElementById('privacyBody');
+
     let selectedFiles = [];
+    let processedItems = [];
     let firstImageRatio = 1;
 
-    fileInput.addEventListener('change', handleFiles);
-    
-    async function handleFiles(e) {
-        selectedFiles = Array.from(e.target.files || e.dataTransfer.files);
+    function applyTheme(theme) {
+        currentTheme = theme;
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('resizer_theme', theme);
+        const t = i18n[currentLang];
+        themeToggle.textContent = theme === 'dark' ? t.themeLight : t.themeDark;
+    }
+
+    function applyLanguage(lang) {
+        currentLang = i18n[lang] ? lang : 'en';
+        localStorage.setItem('resizer_lang', currentLang);
+        document.documentElement.lang = currentLang;
+        const t = i18n[currentLang];
+
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (typeof t[key] === 'string') {
+                el.textContent = t[key];
+            }
+        });
+
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === currentLang);
+        });
+
+        themeToggle.textContent = currentTheme === 'dark' ? t.themeLight : t.themeDark;
+        privacyTitle.textContent = t.privacyTitle;
+        privacyBody.innerHTML = t.privacyHtml;
+
         if (selectedFiles.length > 0) {
-            uploadText.innerText = `Выбрано файлов: ${selectedFiles.length}`;
+            uploadText.textContent = t.selectedFiles(selectedFiles.length);
+        }
+    }
+
+    themeToggle.addEventListener('click', () => {
+        applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => applyLanguage(btn.dataset.lang));
+    });
+
+    function openPrivacy() { privacyModal.classList.add('open'); }
+    function closePrivacy() { privacyModal.classList.remove('open'); }
+
+    document.getElementById('openPrivacyBtn').addEventListener('click', openPrivacy);
+    document.getElementById('closePrivacyBtn').addEventListener('click', closePrivacy);
+    privacyModal.addEventListener('click', (e) => {
+        if (e.target === privacyModal) closePrivacy();
+    });
+    if (window.location.hash === '#privacy') openPrivacy();
+
+    applyTheme(currentTheme);
+    applyLanguage(currentLang);
+
+    function formatBytes(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    fileInput.addEventListener('change', handleFiles);
+
+    async function handleFiles(e) {
+        const files = e.target.files || (e.dataTransfer && e.dataTransfer.files);
+        if (!files || files.length === 0) return;
+
+        selectedFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+        const t = i18n[currentLang];
+
+        if (selectedFiles.length > 0) {
+            uploadText.textContent = t.selectedFiles(selectedFiles.length);
             processBtn.disabled = false;
             downloadLinks.innerHTML = '';
+            zipWrap.style.display = 'none';
+            processedItems = [];
 
             try {
                 const bmp = await createImageBitmap(selectedFiles[0]);
                 firstImageRatio = bmp.width / bmp.height;
-                status.innerText = `Исходный размер: ${bmp.width}×${bmp.height} px`;
-                if (keepRatioCheckbox.checked) {
-                    targetHeightInput.value = Math.round(parseInt(targetWidthInput.value) / firstImageRatio);
+                status.textContent = t.origSize(bmp.width, bmp.height);
+                if (keepRatioCheckbox.checked && targetWidthInput.value) {
+                    targetHeightInput.value = Math.round(parseInt(targetWidthInput.value, 10) / firstImageRatio);
                 }
             } catch (err) {
-                status.innerText = `Готово к обработке`;
+                status.textContent = t.ready;
             }
         }
     }
 
-    // Автопересчёт при включённом сохранении пропорций
+    keepRatioCheckbox.addEventListener('change', () => {
+        if (keepRatioCheckbox.checked && targetWidthInput.value) {
+            targetHeightInput.value = Math.round(parseInt(targetWidthInput.value, 10) / firstImageRatio);
+        }
+    });
+
     targetWidthInput.addEventListener('input', () => {
         if (keepRatioCheckbox.checked && targetWidthInput.value) {
-            targetHeightInput.value = Math.round(parseInt(targetWidthInput.value) / firstImageRatio);
+            targetHeightInput.value = Math.round(parseInt(targetWidthInput.value, 10) / firstImageRatio);
         }
     });
 
     targetHeightInput.addEventListener('input', () => {
         if (keepRatioCheckbox.checked && targetHeightInput.value) {
-            targetWidthInput.value = Math.round(parseInt(targetHeightInput.value) * firstImageRatio);
+            targetWidthInput.value = Math.round(parseInt(targetHeightInput.value, 10) * firstImageRatio);
         }
     });
 
-    // Быстрые кнопки пресетов
     document.querySelectorAll('.preset-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             keepRatioCheckbox.checked = false;
             targetWidthInput.value = btn.dataset.w;
             targetHeightInput.value = btn.dataset.h;
             formatSelect.value = btn.dataset.fmt;
-            status.innerText = `Выбран формат: ${btn.dataset.w}×${btn.dataset.h} PNG`;
+            const ext = btn.dataset.fmt.split('/')[1];
+            status.textContent = i18n[currentLang].presetApplied(btn.dataset.w, btn.dataset.h, ext);
         });
     });
 
     ['dragenter', 'dragover'].forEach(name => {
-        dropZone.addEventListener(name, (e) => { e.preventDefault(); dropZone.style.borderColor = '#7f00ff'; }, false);
+        dropZone.addEventListener(name, (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        }, false);
     });
     ['dragleave', 'drop'].forEach(name => {
-        dropZone.addEventListener(name, (e) => { e.preventDefault(); dropZone.style.borderColor = '#00f2fe'; }, false);
+        dropZone.addEventListener(name, (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+        }, false);
     });
     dropZone.addEventListener('drop', handleFiles);
 
     processBtn.addEventListener('click', async () => {
+        const t = i18n[currentLang];
         processBtn.disabled = true;
-        status.innerText = 'Обработка...';
+        status.textContent = t.processing;
         downloadLinks.innerHTML = '';
+        zipWrap.style.display = 'none';
+        processedItems = [];
 
-        const customWidth = parseInt(targetWidthInput.value);
-        const customHeight = parseInt(targetHeightInput.value);
+        const customWidth = Math.max(10, parseInt(targetWidthInput.value, 10) || 512);
+        const customHeight = Math.max(10, parseInt(targetHeightInput.value, 10) || 512);
         const keepRatio = keepRatioCheckbox.checked;
         const format = formatSelect.value;
-        const quality = parseFloat(document.getElementById('quality').value);
+        const quality = Math.min(1, Math.max(0.1, parseFloat(document.getElementById('quality').value) || 0.9));
         const ext = format.split('/')[1];
 
-        for (let file of selectedFiles) {
+        for (const file of selectedFiles) {
             try {
                 const bitmap = await createImageBitmap(file);
-                let width = customWidth;
-                let height = customHeight;
-
-                if (keepRatio) {
-                    const ratio = bitmap.width / bitmap.height;
-                    height = Math.round(customWidth / ratio);
-                }
+                const width = customWidth;
+                const height = keepRatio ? Math.round(customWidth / (bitmap.width / bitmap.height)) : customHeight;
 
                 const canvas = document.createElement('canvas');
                 canvas.width = width;
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
+
+                if (format === 'image/jpeg') {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, width, height);
+                }
+
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = 'high';
                 ctx.drawImage(bitmap, 0, 0, width, height);
@@ -327,20 +847,112 @@
 
                 const dotIndex = file.name.lastIndexOf('.');
                 const originalName = dotIndex !== -1 ? file.name.substring(0, dotIndex) : file.name;
+                const outName = `${originalName}_${width}x${height}.${ext}`;
+
+                processedItems.push({ name: outName, blob });
+
+                const savedPct = Math.round((1 - blob.size / file.size) * 100);
+                const deltaText = savedPct >= 0 ? `-${savedPct}%` : `+${Math.abs(savedPct)}%`;
+
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `${originalName}_${width}x${height}.${ext}`;
+                a.download = outName;
                 a.className = 'download-btn';
-                a.innerHTML = `<span>💾 ${a.download}</span> <strong>Скачать</strong>`;
+                a.innerHTML = `
+                    <div class="item-left">
+                        <img src="${url}" class="item-thumb" alt="">
+                        <div class="item-info">
+                            <span class="item-name">${outName}</span>
+                            <span class="item-meta">${width}×${height} • ${formatBytes(file.size)} → ${formatBytes(blob.size)} (${deltaText})</span>
+                        </div>
+                    </div>
+                    <strong>${t.downloadBtn}</strong>
+                `;
                 downloadLinks.appendChild(a);
-
             } catch (err) {
                 console.error(err);
-                status.innerText = 'Ошибка при обработке файлов.';
+                status.textContent = t.error;
             }
         }
-        status.innerText = 'Все файлы успешно обработаны!';
+
+        if (processedItems.length > 1) {
+            zipWrap.style.display = 'block';
+        }
+        status.textContent = t.done;
         processBtn.disabled = false;
+    });
+
+    function crc32(buf) {
+        let crc = -1;
+        for (let i = 0; i < buf.length; i++) {
+            crc ^= buf[i];
+            for (let j = 0; j < 8; j++) {
+                crc = (crc >>> 1) ^ (crc & 1 ? 0xEDB88320 : 0);
+            }
+        }
+        return (crc ^ -1) >>> 0;
+    }
+
+    downloadZipBtn.addEventListener('click', async () => {
+        if (!processedItems.length) return;
+        const encoder = new TextEncoder();
+        const fileParts = [];
+        const centralDir = [];
+        let offset = 0;
+
+        for (const item of processedItems) {
+            const data = new Uint8Array(await item.blob.arrayBuffer());
+            const nameBytes = encoder.encode(item.name);
+            const crc = crc32(data);
+
+            const localHeader = new Uint8Array(30 + nameBytes.length);
+            const lv = new DataView(localHeader.buffer);
+            lv.setUint32(0, 0x04034b50, true);
+            lv.setUint16(4, 20, true);
+            lv.setUint16(6, 0x0800, true);
+            lv.setUint32(14, crc, true);
+            lv.setUint32(18, data.length, true);
+            lv.setUint32(22, data.length, true);
+            lv.setUint16(26, nameBytes.length, true);
+            localHeader.set(nameBytes, 30);
+
+            fileParts.push(localHeader, data);
+
+            const cdHeader = new Uint8Array(46 + nameBytes.length);
+            const cv = new DataView(cdHeader.buffer);
+            cv.setUint32(0, 0x02014b50, true);
+            cv.setUint16(4, 20, true);
+            cv.setUint16(6, 20, true);
+            cv.setUint16(8, 0x0800, true);
+            cv.setUint32(16, crc, true);
+            cv.setUint32(20, data.length, true);
+            cv.setUint32(24, data.length, true);
+            cv.setUint16(28, nameBytes.length, true);
+            cv.setUint32(42, offset, true);
+            cdHeader.set(nameBytes, 46);
+
+            centralDir.push(cdHeader);
+            offset += localHeader.length + data.length;
+        }
+
+        const cdSize = centralDir.reduce((acc, part) => acc + part.length, 0);
+        const eocd = new Uint8Array(22);
+        const ev = new DataView(eocd.buffer);
+        ev.setUint32(0, 0x06054b50, true);
+        ev.setUint16(8, processedItems.length, true);
+        ev.setUint16(10, processedItems.length, true);
+        ev.setUint32(12, cdSize, true);
+        ev.setUint32(16, offset, true);
+
+        const zipBlob = new Blob([...fileParts, ...centralDir, eocd], { type: 'application/zip' });
+        const zipUrl = URL.createObjectURL(zipBlob);
+        const a = document.createElement('a');
+        a.href = zipUrl;
+        a.download = 'optimized_images.zip';
+        a.click();
     });
 })();
 </script>
+
+</body>
+</html>
